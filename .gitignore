@@ -1,0 +1,49 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+### VS Code ###
+.vscode/
+
+### 隐藏存储用户上传文件的文件夹 ###
+/teachingPro/
+/indexPoint/
+
+### 单元测试代码 ###
+
+/src/test/
+
+### 代码生成的临时文件 ###
+/workbook.pdf
+/workbook.xls
+/educationProgram/
+/pdf/
+/doc/
+/temp/
+
+application

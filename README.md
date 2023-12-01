@@ -10,3 +10,23 @@
 当你运行此代码时
 API 文档 http://localhost:8080/swagger-ui/index.html
 
+
+
+## 运行指引
+
+当你在本地运行此代码时请检查src/main/resources/lib/application.yml文件
+
+将
+
+```yml
+#使用本地数据库
+url: jdbc:mysql://localhost:3306/Manage_system?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+```
+
+里的
+
+```
+3305/manage_system
+```
+
+换成与自己本地数据库所对应的端口号及数据库名称

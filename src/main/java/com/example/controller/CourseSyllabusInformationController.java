@@ -68,14 +68,22 @@ public class CourseSyllabusInformationController {
         queryWrapper.select("DISTINCT major");
         return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
     }
-
-    @ApiOperation("查询课程类别")
-    @GetMapping("/searchCourseType")
-    public DataResponses searchCourseType() {
-        QueryWrapper<CourseSyllabusInformation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("DISTINCT course_type");
-        return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
     }*/
 
+    @ApiOperation("查询课程名称")
+    @GetMapping("/searchCourseName")
+    public DataResponses searchCourseName() {
+        QueryWrapper<CourseSyllabusInformation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("DISTINCT course_name");
+        return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
+    }
+
+    @ApiOperation("查询课程代码")
+    @GetMapping("/searchCourseCode")
+    public DataResponses searchCourseCode() {
+        QueryWrapper<CourseSyllabusInformation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("DISTINCT course_code");
+        return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
+    }
 
 }

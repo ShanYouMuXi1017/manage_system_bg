@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -174,7 +175,7 @@ public class CourseBasicInformationController {
     }
 
     /*
-        指标点相关接口
+        指标点(按课程)相关接口
      */
 
     @Autowired
@@ -187,8 +188,6 @@ public class CourseBasicInformationController {
     }
 
     @Autowired
-    private IndicatorsMAPPER indicators;
-    @Autowired
     private IndicatorsServiceIMPL indicatorsServiceIMPL;
 
     @ApiOperation("查询全部指标点")
@@ -199,8 +198,8 @@ public class CourseBasicInformationController {
 
     @ApiOperation("添加指标点")
     @PostMapping("/saveIndicator")
-    public DataResponses insertIndicators(@RequestBody Indicators item) {
-        return new DataResponses(true, indicatorsServiceIMPL.save(item));
+    public DataResponses insertIndicators(@RequestBody ArrayList<Indicators> indicatorsList) {
+        return new DataResponses(true, indicatorsServiceIMPL.saveBatch(indicatorsList));
     }
 
     @ApiOperation("查询所有指标点所有专业和版本")
@@ -210,27 +209,19 @@ public class CourseBasicInformationController {
         majorQueryWrapper.select("DISTINCT major");
         QueryWrapper versionQueryWrapper = new QueryWrapper<>();
         versionQueryWrapper.select("DISTINCT version");
-        List majors = indicatorsServiceIMPL.listMaps(majorQueryWrapper);
-        List versions = indicatorsServiceIMPL.listMaps(versionQueryWrapper);
-        return new DataResponses(true, new List[]{majors, versions});
-    }
-
-    @ApiOperation("查询专业指标点")
-    @PostMapping("/indicators")
-    public DataResponses getMajorIndicators(@RequestBody HashMap<String, String> major) {
-        return new DataResponses(true, indicators.getMajorIndicators(major.get("major")));
+        return new DataResponses(true, new List[]{indicatorsServiceIMPL.listMaps(majorQueryWrapper), indicatorsServiceIMPL.listMaps(versionQueryWrapper)});
     }
 
     @ApiOperation("删除指标点")
     @DeleteMapping("/indicators")
-    public DataResponses removeIndicators(@RequestBody Indicators item) {
-        return new DataResponses(indicators.deleteById(item));
+    public DataResponses removeIndicators(@RequestBody ArrayList<Indicators> indicatorsList) {
+        return new DataResponses(indicatorsServiceIMPL.removeBatchByIds(indicatorsList));
     }
 
     @ApiOperation("修改指标点")
     @PutMapping("/indicators")
-    public DataResponses PutIndicators(@RequestBody Indicators item) {
-        return new DataResponses(indicators.updateById(item));
+    public DataResponses PutIndicators(@RequestBody ArrayList<Indicators> indicatorsList) {
+        return new DataResponses(indicatorsServiceIMPL.saveOrUpdateBatch(indicatorsList));
     }
 
     @ApiOperation("按专业和版本号查询指标点")

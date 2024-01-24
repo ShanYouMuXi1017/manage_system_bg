@@ -216,27 +216,27 @@ public class export {
     //根据表格的单元格格式读取相应的值
     public static String getCellStringValue(Cell cell) {
         String cellValue = "";
-        if(cell != null) {
+        if (cell != null) {
             switch (cell.getCellType()) {
-                case Cell.CELL_TYPE_STRING://字符串类型
+                case STRING://字符串类型
                     cellValue = cell.getStringCellValue();
                     if (cellValue.trim().equals("") || cellValue.trim().length() <= 0)
                         cellValue = "";
                     break;
-                case Cell.CELL_TYPE_NUMERIC: //数值类型
-                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                case NUMERIC: //数值类型
+                    cell.setCellType(CellType.STRING);
                     cellValue = cell.getStringCellValue();
                     break;
-                case Cell.CELL_TYPE_FORMULA: //公式
-                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                case FORMULA: //公式
+                    cell.setCellType(CellType.STRING);
                     cellValue = cell.getStringCellValue();
                     break;
-                case Cell.CELL_TYPE_BLANK:
+                case BLANK:
                     cellValue = "";
                     break;
-                case Cell.CELL_TYPE_BOOLEAN:
+                case BOOLEAN:
                     break;
-                case Cell.CELL_TYPE_ERROR:
+                case ERROR:
                     break;
                 default:
                     break;

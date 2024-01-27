@@ -148,7 +148,7 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
             byte[] pdfBytes = Files.readAllBytes(Paths.get("indicators.pdf"));
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.pdf");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=indicators.pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
             return ResponseEntity.ok()
                     .headers(headers)

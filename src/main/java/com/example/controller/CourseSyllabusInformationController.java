@@ -13,16 +13,19 @@ import com.example.utility.DataResponses;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/courseSyllabus")
 public class CourseSyllabusInformationController {
-
 
 
     @Autowired
@@ -77,5 +80,25 @@ public class CourseSyllabusInformationController {
         return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
     }*/
 
+    //目前仅获取专业
+    @ApiOperation("获得教学大纲课程的所有专业和版本")
+    @GetMapping("/syllabusCourseMajorsAndVersions")
+    public DataResponses syllabusCourseMajorsAndVersions() {
+        QueryWrapper majorQueryWrapper = new QueryWrapper<>();
+        majorQueryWrapper.select("DISTINCT major");
+        return new DataResponses(true, new List[]{courseSyllabusInformationService.listMaps(majorQueryWrapper)});
+    }
+
+    @ApiOperation("录入培养方案课程")
+    @PostMapping("/inputEducationProgramCourse")
+    public DataResponses inputEducationProgramCourse(@RequestParam("file") MultipartFile file) {
+        return courseSyllabusInformationService.inputEducationProgramCourse(file);
+    }
+
+    @ApiOperation("获取培养方案课程Excel填写模版")
+    @GetMapping("/getInputEducationProgramCourseTemplate")
+    public ResponseEntity<byte[]> getInputEducationProgramCourseTemple(HttpServletResponse response) {
+        return courseSyllabusInformationService.getInputEducationProgramCourseTemplate(response);
+    }
 
 }

@@ -11,7 +11,7 @@ import java.util.List;
  * <a href="https://deepoove.com/poi-tl/apache-poi-guide.html">Apache POI Word文档参考阅读</a>
  */
 public class WordReader {
-    public XWPFDocument wordFile;
+    public XWPFDocument wordDoc;
 
     /**
      * 构架wordReader对象
@@ -20,7 +20,7 @@ public class WordReader {
      */
     public WordReader(FileInputStream wordFileInputStream) {
         try {
-            this.wordFile = new XWPFDocument(wordFileInputStream);
+            this.wordDoc = new XWPFDocument(wordFileInputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,7 +32,7 @@ public class WordReader {
      * @return 所有段落的List集合
      */
     public List<XWPFParagraph> getAllParagraphs() {
-        return this.wordFile.getParagraphs();
+        return this.wordDoc.getParagraphs();
     }
 
     /**
@@ -41,7 +41,7 @@ public class WordReader {
      * @return 所有表格的List集合
      */
     public List<XWPFTable> getAllTables() {
-        return this.wordFile.getTables();
+        return this.wordDoc.getTables();
     }
 
     /**
@@ -50,7 +50,7 @@ public class WordReader {
      * @return 所有图片的List集合
      */
     public List<XWPFPictureData> getAllPictures() {
-        return this.wordFile.getAllPictures();
+        return this.wordDoc.getAllPictures();
     }
 
     /**
@@ -59,7 +59,7 @@ public class WordReader {
      * @return 所有页眉的List集合
      */
     public List<XWPFHeader> getAllPageHeader() {
-        return this.wordFile.getHeaderList();
+        return this.wordDoc.getHeaderList();
     }
 
     /**
@@ -68,7 +68,7 @@ public class WordReader {
      * @return 所有页脚的List集合
      */
     public List<XWPFFooter> getAllPageFooter() {
-        return this.wordFile.getFooterList();
+        return this.wordDoc.getFooterList();
     }
 
 }

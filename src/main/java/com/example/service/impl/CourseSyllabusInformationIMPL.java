@@ -1,11 +1,14 @@
 package com.example.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.CourseSyllabusInformationMAPPER;
 import com.example.object.CourseSyllabusInformation;
+import com.example.object.Indicators;
 import com.example.service.CourseSyllabusInformationSERVICE;
 import com.example.utility.DataResponses;
 import com.example.utility.DocPOI.ExcelReader;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,45 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 @Service
 public class CourseSyllabusInformationIMPL extends ServiceImpl<CourseSyllabusInformationMAPPER, CourseSyllabusInformation> implements CourseSyllabusInformationSERVICE {
+
+    public DataResponses getAllMajorsAndVersions() {
+        @Data
+        class MajorsAndVersions {
+            String major;
+            List<String> versions;
+
+            public MajorsAndVersions(String major, List<String> versions) {
+                this.major = major;
+                this.versions = versions;
+            }
+        }
+
+        List<Map<String, Object>> majorsMap = listMaps(
+                new QueryWrapper<CourseSyllabusInformation>().select("DISTINCT major")
+        );
+        List<MajorsAndVersions> majorsAndVersions = new ArrayList<>();
+        //简单粗暴
+        for (Map<String, Object> majorMap : majorsMap) {
+            String major = StringUtils.substringBetween(
+                    majorMap.values().toString(),
+                    "[", "]");
+            List<String> versions = new ArrayList<>();
+            listMaps(new QueryWrapper<CourseSyllabusInformation>()
+                    .select("DISTINCT version")
+                    .lambda()
+                    .eq(CourseSyllabusInformation::getMajor, major)
+            ).forEach(item -> item.values().forEach(
+                    v -> versions.add(v.toString().substring(0, 4)
+                    )));
+            majorsAndVersions.add(new MajorsAndVersions(major, versions));
+        }
+        return new DataResponses(true, majorsAndVersions);
+    }
 
     /**
      * 获得培养方案课程模版文件

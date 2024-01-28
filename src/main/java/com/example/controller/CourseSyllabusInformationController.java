@@ -80,13 +80,10 @@ public class CourseSyllabusInformationController {
         return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
     }*/
 
-    //目前仅获取专业
     @ApiOperation("获得教学大纲课程的所有专业和版本")
     @GetMapping("/syllabusCourseMajorsAndVersions")
     public DataResponses syllabusCourseMajorsAndVersions() {
-        QueryWrapper majorQueryWrapper = new QueryWrapper<>();
-        majorQueryWrapper.select("DISTINCT major");
-        return new DataResponses(true, new List[]{courseSyllabusInformationService.listMaps(majorQueryWrapper)});
+        return courseSyllabusInformationService.getAllMajorsAndVersions();
     }
 
     @ApiOperation("录入培养方案课程")

@@ -12,13 +12,10 @@ import java.util.List;
 public interface UserMAPPER extends BaseMapper<User> {
 
     //    在此出写拓展sql
-    @Select("SELECT id,is_admin from user GROUP BY is_admin;")
-    List<User> userPreList();
+    @Select("SELECT id,name,teacher_name,is_admin,department,college_name from user;")
+    List<User> getUser();
 
-    @Select("SELECT id,college_name from college GROUP BY college_name;")
-    List<College> userPrCollegeList();
-
-    @Select("SELECT id,college_name,department_name from college GROUP BY department_name;")
-    List<College> userDerList();
+    @Select("SELECT is_admin from user group by is_admin;")
+    List<User> getPower();
 
 }

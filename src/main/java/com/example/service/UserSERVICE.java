@@ -19,16 +19,15 @@ public interface UserSERVICE extends IService<User> {
     //mapper中添加的方法在此处声明
     //也可以通过@Override重写方法
 
-
-
     DataResponses login(LoginDTO user);
 
+    List<User> getUser();
 
-    List<User> userPreList();
+    List<User> getPower();
 
-    List<College> userPrCollegeList();
+    List<College> getCollege();
 
-    List<College> userDerList();
+    List<College> getDepartment();
 
     //用户信息导入
     @Transactional

@@ -3,6 +3,7 @@ package com.example.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.mapper.CollegeMAPPER;
 import com.example.mapper.UserMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
 import com.example.object.College;
@@ -38,15 +39,18 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
 
     private final UserMAPPER userMAPPER;
 
+    private final CollegeMAPPER collegeMAPPER ;
+
     private final StudentInformationMAPPER studentInformationMAPPER;
 
     final
     TokenUtil tokenUtil;
 
-    public UserServiceIMPL(UserMAPPER userMAPPER, StudentInformationMAPPER studentInformationMAPPER, TokenUtil tokenUtil) {
+    public UserServiceIMPL(UserMAPPER userMAPPER, StudentInformationMAPPER studentInformationMAPPER, TokenUtil tokenUtil,CollegeMAPPER collegeMAPPER) {
         this.userMAPPER = userMAPPER;
         this.studentInformationMAPPER = studentInformationMAPPER;
         this.tokenUtil = tokenUtil;
+        this.collegeMAPPER= collegeMAPPER;
     }
 
     @Override
@@ -111,19 +115,23 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
     }
 
     @Override
-    public List<User> userPreList() {
-        return userMAPPER.userPreList();
+    public List<User> getUser() {
+        return userMAPPER.getUser();
     }
 
+    @Override
+    public List<User> getPower() {
+        return userMAPPER.getPower();
+    }
 
     @Override
-    public List<College> userPrCollegeList(){
-        return userMAPPER.userPrCollegeList();}
-
+    public List<College> getCollege(){
+        return collegeMAPPER.getCollege();
+    }
 
     @Override
-    public List<College> userDerList(){
-        return userMAPPER.userDerList();
+    public List<College> getDepartment(){
+        return collegeMAPPER.getDepartment();
     }
 
 
@@ -271,7 +279,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             XSSFCellStyle constraintStyle = wb.createCellStyle();
 
 // 使用Arrays.asList()将String数组转换为List<String>
-            List<User> userList =  userMAPPER.userPreList(); // 从数据库获取数据
+            List<User> userList =  userMAPPER.getPower(); // 从数据库获取数据
             String[] isAdminArray = new String[userList.size()]; // 创建与结果数量相同的数组
 
             for (int i = 0; i < userList.size(); i++) {
@@ -284,12 +292,12 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                 }else if (user.getIsAdmin()==2){
                     isAdmin = "学院";
                 }else if (user.getIsAdmin()==3){
-                    isAdmin = "校级";
+                    isAdmin = "校领导与最高管理员";
                 }
                 isAdminArray[i] = isAdmin;  // 假设 User 类有一个名为 getIsAdmin 的方法来获取 is_admin 字段
             }
 
-            List<College> collegeList =  userMAPPER.userPrCollegeList(); // 从数据库获取数据
+            List<College> collegeList =  collegeMAPPER.getCollege(); // 从数据库获取数据
             String[] collegeArray = new String[collegeList.size()]; // 创建与结果数量相同的数组
             for (int i = 0; i < collegeList.size(); i++) {
                 College college = collegeList.get(i);
@@ -297,7 +305,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                 collegeArray[i] = colleges;
             }
 
-            List<College> departmentList =  userMAPPER.userDerList(); // 从数据库获取数据
+            List<College> departmentList =  collegeMAPPER.getDepartment(); // 从数据库获取数据
             String[] departmentArray = new String[departmentList.size()]; // 创建与结果数量相同的数组
             for (int i = 0; i < departmentList.size(); i++) {
                 College department = departmentList.get(i);
@@ -432,6 +440,8 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                     adminName = "系主任";
                 }else if (user.getIsAdmin()==2){
                     adminName = "学院";
+                } else if (user.getIsAdmin()==3){
+                    adminName = "校领导与最高管理员";
                 }
                 cell4.setCellValue(adminName);
                 XSSFCell cell5 = dataRow.createCell(5);

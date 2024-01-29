@@ -7,6 +7,7 @@ import com.example.object.College;
 
 import com.example.object.LoginDTO;
 import com.example.object.User;
+import com.example.service.impl.CollegeServiceIMPL;
 import com.example.service.impl.UserServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
@@ -28,13 +29,13 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
-
     private UserServiceIMPL userService;
 
+    @Autowired
+    private UserServiceIMPL userServiceIMPL;
 
     @Autowired
-
-    private UserServiceIMPL userServiceIMPL;
+    private CollegeServiceIMPL  collegeServiceIMPL;
 
     // 会话登录接口
     @PostMapping("/doLogin")
@@ -74,6 +75,7 @@ public class UserController {
      * @param role 0    普通教师
      *             1    系主任
      *             2    学院
+     *             3    校领导与最高管理员
      * @return DataResponses
      */
     @PostMapping("/choiceRole")
@@ -116,17 +118,33 @@ public class UserController {
         return new DataResponses(true,userServiceIMPL.removeById(user.getId()));
     }
 
-    @ApiOperation("查询全部")
+    @ApiOperation("查询全部用户")
     @GetMapping
     public DataResponses getAll() {
-
-        List<User> data= userService.list() ;
-        List<College> data2= userService.userPrCollegeList() ;
-        List<College> data3= userService.userDerList() ;
-        return new DataResponses(true, data,data2,data3);
-
+        List<User> data= userService.getUser() ;
+        return new DataResponses(true, data);
     }
 
+    @ApiOperation("查询学院")
+    @GetMapping("/getCollege")
+    public DataResponses getCollege() {
+        List<College> data= collegeServiceIMPL.getCollege() ;
+        return new DataResponses(true, data);
+    }
+
+    @ApiOperation("查询系")
+    @GetMapping("/getDepartment")
+    public DataResponses getDepartment() {
+        List<College> data= collegeServiceIMPL.getDepartment() ;
+        return new DataResponses(true, data);
+    }
+
+    @ApiOperation("查询权限")
+    @GetMapping("/getPower")
+    public DataResponses getPower() {
+        List<User> data= userService.getPower() ;
+        return new DataResponses(true, data);
+    }
     /**
      * 导入教师信息
      */

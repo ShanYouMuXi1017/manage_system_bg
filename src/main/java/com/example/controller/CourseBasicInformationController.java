@@ -17,6 +17,7 @@ import com.example.utility.DataResponses;
 import com.example.utility.export.export;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,9 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @CrossOrigin(origins = "*")
 @Api(tags = "课程信息")
@@ -205,11 +204,7 @@ public class CourseBasicInformationController {
     @ApiOperation("查询所有指标点所有专业和版本")
     @GetMapping("/indicatorMajorsAndVersions")
     public DataResponses getAllIndicatorMajors() {
-        QueryWrapper majorQueryWrapper = new QueryWrapper<>();
-        majorQueryWrapper.select("DISTINCT major");
-        QueryWrapper versionQueryWrapper = new QueryWrapper<>();
-        versionQueryWrapper.select("DISTINCT version");
-        return new DataResponses(true, new List[]{indicatorsServiceIMPL.listMaps(majorQueryWrapper), indicatorsServiceIMPL.listMaps(versionQueryWrapper)});
+        return indicatorsServiceIMPL.getAllMajorsAndVersions();
     }
 
     @ApiOperation("删除指标点")

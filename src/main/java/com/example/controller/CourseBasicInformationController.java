@@ -1,14 +1,12 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.CollegeMAPPER;
 import com.example.mapper.CourseSyllabusInformationMAPPER;
 import com.example.mapper.CourseTargetMAPPER;
 import com.example.mapper.IndicatorsMAPPER;
 import com.example.mapper.courseSurvey.CourseAttainmentSurveyMAPPER;
-import com.example.object.CourseBasicInformation;
-import com.example.object.CourseSyllabusInformation;
-import com.example.object.CourseTarget;
-import com.example.object.Indicators;
+import com.example.object.*;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.service.impl.CourseSyllabusInformationIMPL;
 import com.example.service.impl.IndicatorOutlineSERVICEIMPL;
@@ -424,6 +422,17 @@ public class CourseBasicInformationController {
     @PutMapping("/syllabus")
     public DataResponses insert(@RequestBody CourseSyllabusInformation item) {
         return new DataResponses(true, courseSyllabusInformationMAPPER.insert(item));
+    }
+
+    @Autowired
+    private CollegeMAPPER collegeMAPPER;
+    @ApiOperation("根据用户查询专业")
+    @PostMapping("/majorList")
+    public DataResponses majorList(@RequestBody HashMap<String, String> info) {
+        QueryWrapper<College> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("college_name", info.get("collegeName"));
+        queryWrapper.select(" major_name");
+        return new DataResponses(true, collegeMAPPER.selectList(queryWrapper));
     }
 
 }

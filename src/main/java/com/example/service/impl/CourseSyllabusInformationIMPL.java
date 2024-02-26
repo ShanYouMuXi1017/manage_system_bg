@@ -132,7 +132,7 @@ public class CourseSyllabusInformationIMPL extends ServiceImpl<CourseSyllabusInf
             courseType.add("专业基础课");
             courseType.add("专业核心课");
             courseType.add("专业特色课");
-            courseType.add("集中性实践教学");
+            courseType.add("专业集中性实践教学");
             courseType.add("专业素质教育");
             int[] parseNumOfCourseType = {0, 0, 0, 0, 0, 0};
 

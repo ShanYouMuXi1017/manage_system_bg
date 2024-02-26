@@ -35,6 +35,10 @@ public class CourseSyllabusInformation {
     //课程版本(依照培养方案)
     private String version;
 
+    //解决Cannot determine value type from string“xxxxx”
+    public CourseSyllabusInformation() {
+    }
+
     //构造函数, 用于录入培养方案课程数据
     public CourseSyllabusInformation(String courseName, String courseCode, String major, Double credit, int theoreticalHours, int labHours, String courseNature, String courseType, String version) {
         this.courseName = courseName;

@@ -18,16 +18,19 @@ import com.example.utility.DataResponses;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/courseSyllabus")
 public class CourseSyllabusInformationController {
-
 
 
     @Autowired
@@ -61,6 +64,8 @@ public class CourseSyllabusInformationController {
         QueryWrapper<CourseSyllabusInformation> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("major", info.get("major"));
         queryWrapper.eq("course_type", info.get("type"));
+        queryWrapper.eq("version",info.get("version"));
+
 
         return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
     }
@@ -116,128 +121,22 @@ public class CourseSyllabusInformationController {
         return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
     }*/
 
-
-    /*
-     * 教学大纲设置相关接口
-     * */
-
-    /*
-     * 课程基本信息相关接口
-     * */
-
-    @ApiOperation("按当前用户查询")
-    @GetMapping("/currentUser/{currentUserName}")
-    public DataResponses getByCurrentUser(@PathVariable String currentUserName) {
-        QueryWrapper<CourseSyllabusInformation> QueryWrapper = new QueryWrapper<>();
-        QueryWrapper.eq("upload_user", currentUserName);
-
-        return new DataResponses(true, courseSyllabusInformationService.list(QueryWrapper));
+    @ApiOperation("获得教学大纲课程的所有专业和版本")
+    @GetMapping("/syllabusCourseMajorsAndVersions")
+    public DataResponses syllabusCourseMajorsAndVersions() {
+        return courseSyllabusInformationService.getAllMajorsAndVersions();
     }
 
-    @ApiOperation("根据课程负责人查询对应课程")
-    @PostMapping  ("/currentUser")
-    public DataResponses getSyllabusCourse(@RequestBody HashMap<String, String> info) {
-        QueryWrapper<CourseSyllabusInformation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("upload_user", info.get("upload_user"));
-        return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
+    @ApiOperation("录入培养方案课程")
+    @PostMapping("/inputEducationProgramCourse")
+    public DataResponses inputEducationProgramCourse(@RequestParam("file") MultipartFile file) {
+        return courseSyllabusInformationService.inputEducationProgramCourse(file);
     }
 
-    @ApiOperation("添加")
-    @PostMapping
-    public DataResponses Add(@RequestBody CourseSyllabusInformation pages) {
-        return new DataResponses(courseSyllabusInformationService.save(pages));
-    }
-
-    @ApiOperation("按id查询")
-    @GetMapping("/{id}")
-    public DataResponses getById(@PathVariable int id) {
-        return new DataResponses(true, courseSyllabusInformationService.getById(id));
-    }
-
-    @ApiOperation("按id修改")
-    @PutMapping()
-    public DataResponses UpdateById(@RequestBody CourseSyllabusInformation data) {
-        return new DataResponses(courseSyllabusInformationService.updateById(data));
-    }
-
-    @ApiOperation("查询全部")
-    @GetMapping
-    public DataResponses getAll() {
-        return new DataResponses(true, courseSyllabusInformationService.list());
-    }
-
-
-    @Autowired
-    private UserMAPPER userMAPPER;
-    @ApiOperation("获取该教师的id")
-    @GetMapping("/courseTeacherId{courseTeacherName}")
-    public DataResponses getCourseTeacherId(@PathVariable String courseTeacherName) {
-        QueryWrapper<User> QueryWrapper = new QueryWrapper<>();
-        QueryWrapper.eq("teacher_name", courseTeacherName);
-        return new DataResponses(true, userMAPPER.selectList(QueryWrapper));
-
-    }
-
-    @Autowired
-    private CourseBasicInformationServiceIMPL courseBasicInformationService;
-    @Autowired
-    private CourseBasicInformationMAPPER courseBasicInformationMAPPER;
-
-    @ApiOperation("添加或修改")
-    @PostMapping("/saveCourseBasic")
-    public DataResponses write(@RequestBody CourseBasicInformation pages) {
-        QueryWrapper<CourseBasicInformation> queryWrapper = new QueryWrapper<>();
-        Integer id = pages.getId();
-        int courseId = (int)id;
-        boolean exists = courseBasicInformationMAPPER.exists(queryWrapper.eq("id",courseId));
-        if(exists){
-            return new DataResponses(courseBasicInformationService.updateById(pages));
-        }
-        return new DataResponses(courseBasicInformationService.save(pages));
-    }
-
-    /*课程目标相关接口*/
-
-    @Autowired
-    private CourseTargetMAPPER courseTarget;
-
-    @ApiOperation("获取该课程所有课程目标")
-    @GetMapping("/currentTarget/{courseId}")
-    public DataResponses getCurrentTarget(@PathVariable int courseId) {
-        QueryWrapper<CourseTarget> QueryWrapper = new QueryWrapper<>();
-        QueryWrapper.eq("course_id", courseId);
-        return new DataResponses(true, courseTarget.selectList(QueryWrapper));
-    }
-
-    @ApiOperation("添加该课程课程目标")
-    @PostMapping("/saveCourseTarget")
-    public DataResponses addCourseTarget(@RequestBody CourseTarget Data) {
-        return new DataResponses(true, courseTarget.insert(Data),String.valueOf(Data.getId()));
-    }
-
-    @ApiOperation("删除课程目标")
-    @DeleteMapping("/delCourseTarget")
-    public DataResponses DeleteCourseTarget(@RequestBody CourseTarget Data) {
-        return new DataResponses(true, courseTarget.deleteById(Data));
-    }
-
-    @ApiOperation("修改课程目标")
-    @PutMapping("/modCourseTarget")
-    public DataResponses modifyCourseTarget(@RequestBody CourseTarget Data) {
-        return new DataResponses(true, courseTarget.updateById(Data));
-    }
-
-
-
-
-    /*课程考核评价方式相关接口*/
-
-    @ApiOperation("获取该课程所有课程目标")
-    @GetMapping("/courseTarget/{courseId}")
-    public DataResponses getCourseTarget(@PathVariable int courseId) {
-        QueryWrapper<CourseTarget> QueryWrapper = new QueryWrapper<>();
-        QueryWrapper.eq("course_id", courseId);
-        return new DataResponses(true, courseTarget.selectList(QueryWrapper));
+    @ApiOperation("获取培养方案课程Excel填写模版")
+    @GetMapping("/getInputEducationProgramCourseTemplate")
+    public ResponseEntity<byte[]> getInputEducationProgramCourseTemple(HttpServletResponse response) {
+        return courseSyllabusInformationService.getInputEducationProgramCourseTemplate(response);
     }
 
 }

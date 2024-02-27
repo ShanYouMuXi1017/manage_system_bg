@@ -11,8 +11,6 @@ public class CourseBasicInformation {
     private String major;
     //课程代码
     private String courseCode;
-    //教学大纲表中的id
-    private int courseId;
     //任课教师id
     private int teacherId;
     //任课教师

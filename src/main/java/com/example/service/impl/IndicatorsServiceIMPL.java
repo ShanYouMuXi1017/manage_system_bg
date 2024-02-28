@@ -11,32 +11,19 @@ import com.example.service.IndicatorsSERVICE;
 import com.example.utility.DataResponses;
 import com.example.utility.DocPOI.ExcelWriter;
 import com.example.utility.DocPOI.WordWriter;
-import com.example.utility.export.export;
-import com.sini.com.spire.doc.Table;
-import com.sini.com.spire.doc.*;
-import com.sini.com.spire.doc.documents.*;
-import com.spire.xls.FileFormat;
-import com.spire.xls.Workbook;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xwpf.usermodel.TableRowAlign;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
-import java.awt.Color;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -44,7 +31,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicators> implements IndicatorsSERVICE {
@@ -153,11 +139,9 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
             byte[] pdfBytes = Files.readAllBytes(Paths.get("indicators.pdf"));
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=indicators.pdf");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(pdfBytes);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(pdfBytes.length);
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
         } catch (IOException ignored) {
         }
         return null;

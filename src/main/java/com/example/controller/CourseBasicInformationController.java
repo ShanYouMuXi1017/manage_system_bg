@@ -200,9 +200,9 @@ public class CourseBasicInformationController {
     }
 
     @ApiOperation("查询所有指标点所有专业和版本")
-    @GetMapping("/indicatorMajorsAndVersions")
-    public DataResponses getAllIndicatorMajors() {
-        return indicatorsServiceIMPL.getAllMajorsAndVersions();
+    @PostMapping("/indicatorMajorsAndVersions")
+    public DataResponses getAllIndicatorMajors(@RequestBody HashMap<String, String> permissionAndCollege) {
+        return indicatorsServiceIMPL.getAllMajorsAndVersions(permissionAndCollege);
     }
 
     @ApiOperation("删除指标点")

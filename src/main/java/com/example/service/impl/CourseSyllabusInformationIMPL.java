@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.CourseSyllabusInformationMAPPER;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -72,9 +74,9 @@ public class CourseSyllabusInformationIMPL extends ServiceImpl<CourseSyllabusInf
         //写入文件
         //使用字节数组读取
         try {
-            //主义文件名
-            String template = "src/main/resources/static/培养方案课程录入.xlsx";
-            byte[] bytes = Files.readAllBytes(Paths.get(template));
+            String template = "/src/main/resources/static/培养方案课程录入.xlsx";
+            byte[] bytes = FileUtil.readBytes(
+                    new File("").getCanonicalPath() + template);
 
             response.reset();
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

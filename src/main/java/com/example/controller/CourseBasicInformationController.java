@@ -430,7 +430,12 @@ public class CourseBasicInformationController {
     @PostMapping("/majorList")
     public DataResponses majorList(@RequestBody HashMap<String, String> info) {
         QueryWrapper<College> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("college_name", info.get("collegeName"));
+        String admin = info.get("isAdmin");
+        if(admin.equals("3")){
+            queryWrapper.select(" major_name");
+            return new DataResponses(true, collegeMAPPER.selectList(queryWrapper));
+        }
+        queryWrapper.eq("college_name", info.get("collegeName"));
         queryWrapper.select(" major_name");
         return new DataResponses(true, collegeMAPPER.selectList(queryWrapper));
     }

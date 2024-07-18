@@ -3,8 +3,10 @@ package com.example.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.object.College;
 import com.example.object.LoginDTO;
+import com.example.object.ModifyPassDTO;
 import com.example.object.User;
 import com.example.utility.DataResponses;
+import io.swagger.models.auth.In;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,10 +31,11 @@ public interface UserSERVICE extends IService<User> {
 
     List<College> getDepartment();
 
+    DataResponses updatePassword(ModifyPassDTO data);
+
     //用户信息导入
     @Transactional
     DataResponses inputUserInfo(MultipartFile file);
-
 
     //导出模板XLS
     ResponseEntity<byte[]> exportUserInformation(HttpServletRequest request, HttpServletResponse response) throws IOException;

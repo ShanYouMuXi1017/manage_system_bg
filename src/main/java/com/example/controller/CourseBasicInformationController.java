@@ -51,6 +51,13 @@ public class CourseBasicInformationController {
     @Autowired
     private CourseBasicInformationServiceIMPL courseBasicInformationService;
 
+    @ApiOperation("查询所有专业以及专业下面的所有课程名称")
+    @GetMapping("/tree")
+    public List<Map<String, Object>> getCourseTree() {
+        return courseBasicInformationService.getCourseTree();
+    }
+
+
     @ApiOperation("查询全部")
     @GetMapping
     public DataResponses getAll() {

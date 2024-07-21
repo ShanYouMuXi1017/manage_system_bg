@@ -1,14 +1,12 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.CollegeMAPPER;
 import com.example.mapper.CourseSyllabusInformationMAPPER;
 import com.example.mapper.CourseTargetMAPPER;
 import com.example.mapper.IndicatorsMAPPER;
 import com.example.mapper.courseSurvey.CourseAttainmentSurveyMAPPER;
-import com.example.object.CourseBasicInformation;
-import com.example.object.CourseSyllabusInformation;
-import com.example.object.CourseTarget;
-import com.example.object.Indicators;
+import com.example.object.*;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.service.impl.CourseSyllabusInformationIMPL;
 import com.example.service.impl.IndicatorOutlineSERVICEIMPL;
@@ -17,6 +15,7 @@ import com.example.utility.DataResponses;
 import com.example.utility.export.export;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,9 +30,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @CrossOrigin(origins = "*")
 @Api(tags = "课程信息")
@@ -53,6 +50,13 @@ public class CourseBasicInformationController {
     //课程基本信息
     @Autowired
     private CourseBasicInformationServiceIMPL courseBasicInformationService;
+
+    @ApiOperation("查询所有专业以及专业下面的所有课程名称")
+    @GetMapping("/tree")
+    public List<Map<String, Object>> getCourseTree() {
+        return courseBasicInformationService.getCourseTree();
+    }
+
 
     @ApiOperation("查询全部")
     @GetMapping
@@ -203,13 +207,9 @@ public class CourseBasicInformationController {
     }
 
     @ApiOperation("查询所有指标点所有专业和版本")
-    @GetMapping("/indicatorMajorsAndVersions")
-    public DataResponses getAllIndicatorMajors() {
-        QueryWrapper majorQueryWrapper = new QueryWrapper<>();
-        majorQueryWrapper.select("DISTINCT major");
-        QueryWrapper versionQueryWrapper = new QueryWrapper<>();
-        versionQueryWrapper.select("DISTINCT version");
-        return new DataResponses(true, new List[]{indicatorsServiceIMPL.listMaps(majorQueryWrapper), indicatorsServiceIMPL.listMaps(versionQueryWrapper)});
+    @PostMapping("/indicatorMajorsAndVersions")
+    public DataResponses getAllIndicatorMajors(@RequestBody HashMap<String, String> permissionAndCollege) {
+        return indicatorsServiceIMPL.getAllMajorsAndVersions(permissionAndCollege);
     }
 
     @ApiOperation("删除指标点")
@@ -429,6 +429,22 @@ public class CourseBasicInformationController {
     @PutMapping("/syllabus")
     public DataResponses insert(@RequestBody CourseSyllabusInformation item) {
         return new DataResponses(true, courseSyllabusInformationMAPPER.insert(item));
+    }
+
+    @Autowired
+    private CollegeMAPPER collegeMAPPER;
+    @ApiOperation("根据用户查询专业")
+    @PostMapping("/majorList")
+    public DataResponses majorList(@RequestBody HashMap<String, String> info) {
+        QueryWrapper<College> queryWrapper = new QueryWrapper<>();
+        String admin = info.get("isAdmin");
+        if(admin.equals("3")){
+            queryWrapper.select(" major_name");
+            return new DataResponses(true, collegeMAPPER.selectList(queryWrapper));
+        }
+        queryWrapper.eq("college_name", info.get("collegeName"));
+        queryWrapper.select(" major_name");
+        return new DataResponses(true, collegeMAPPER.selectList(queryWrapper));
     }
 
 }

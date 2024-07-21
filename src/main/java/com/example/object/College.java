@@ -1,5 +1,8 @@
 package com.example.object;
 
+import lombok.Data;
+
+@Data
 public class College {
 
 

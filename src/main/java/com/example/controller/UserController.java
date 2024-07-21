@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.object.College;
 
 import com.example.object.LoginDTO;
+import com.example.object.ModifyPassDTO;
 import com.example.object.User;
 import com.example.service.impl.CollegeServiceIMPL;
 import com.example.service.impl.UserServiceIMPL;
@@ -97,6 +98,17 @@ public class UserController {
     public DataResponses updateUser(@RequestBody User data) {
         return new DataResponses(true,userServiceIMPL.updateById(data));
     }
+
+    @ApiOperation("按id修改密码")
+    @PostMapping("/updatePassById")
+    public DataResponses updatePassById(@RequestBody ModifyPassDTO data) {
+        DataResponses resp = userServiceIMPL.updatePassword(data);
+        if(resp.getFlag()){
+            return new DataResponses(true,resp);
+        }
+        return new DataResponses(false,resp);
+    }
+
 
     @ApiOperation("添加")
     @PostMapping("/addUser")

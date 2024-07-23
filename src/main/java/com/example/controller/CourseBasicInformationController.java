@@ -447,4 +447,19 @@ public class CourseBasicInformationController {
         return new DataResponses(true, collegeMAPPER.selectList(queryWrapper));
     }
 
+
+//    以下接口用于继承
+    @Autowired(required=false)
+        @ApiOperation("根据课程名称查询课程信息")
+        @GetMapping("/majorList/{courseName}")
+        public DataResponses nameMajorList(@PathVariable String courseName) {
+            System.out.println(courseName);
+
+            List<CourseBasicInformation> list = courseBasicInformationService.couresNameList(courseName);
+            System.out.println(list);
+            return new DataResponses(true, list);
+        }
+
+
+
 }

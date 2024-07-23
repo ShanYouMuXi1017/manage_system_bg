@@ -10,4 +10,6 @@ public interface CourseBasicInformationSERVICE extends IService<CourseBasicInfor
     //mapper中添加的方法在此处声明
     //也可以通过@Override重写方法
     public List<Map<String, Object>> getCourseTree();
+
+    public List<CourseBasicInformation> couresNameList(String coursename);
 }

@@ -43,4 +43,9 @@ public class CourseBasicInformationServiceIMPL extends ServiceImpl<CourseBasicIn
 
         return treeData;
     }
+
+    @Override
+    public List<CourseBasicInformation> couresNameList(String coursename) {
+        return courseMapper.courseMapper(coursename);
+    }
 }

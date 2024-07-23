@@ -22,4 +22,6 @@ public interface CourseBasicInformationMAPPER extends BaseMapper<CourseBasicInfo
     @Select("SELECT major, course_name FROM course_syllabus_information ORDER BY major, course_name")
     List<CourseSyllabusInformation> getCourses();
 
+    @Select("SELECT * FROM course_basic_information WHERE course_name = #{coursename}")
+    List<CourseBasicInformation> courseMapper(@Param("coursename") String coursename);
 }

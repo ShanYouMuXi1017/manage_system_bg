@@ -48,4 +48,9 @@ public class CourseBasicInformationServiceIMPL extends ServiceImpl<CourseBasicIn
     public List<CourseBasicInformation> couresNameList(String coursename) {
         return courseMapper.courseMapper(coursename);
     }
+
+    @Override
+    public int getNewCourseId() {
+        return courseMapper.getNewCourseId();
+    }
 }

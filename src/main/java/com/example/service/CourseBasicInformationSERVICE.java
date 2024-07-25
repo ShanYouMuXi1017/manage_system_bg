@@ -12,4 +12,6 @@ public interface CourseBasicInformationSERVICE extends IService<CourseBasicInfor
     public List<Map<String, Object>> getCourseTree();
 
     public List<CourseBasicInformation> couresNameList(String coursename);
+
+    public int getNewCourseId();
 }

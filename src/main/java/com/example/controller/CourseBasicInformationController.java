@@ -132,6 +132,14 @@ public class CourseBasicInformationController {
         return new DataResponses(courseBasicInformationService.removeById(pages));
     }
 
+    @ApiOperation("获取最新的id")
+    @GetMapping("/getNewCourseId")
+    public int getNewCourseId() {
+        int id = courseBasicInformationService.getNewCourseId();
+        System.out.println("id"+id);
+        return id;
+    }
+
 /*
     课程目标相关接口
  */
@@ -163,6 +171,8 @@ public class CourseBasicInformationController {
 //        CourseAttainmentSurvey courseAttainmentSurvey = new CourseAttainmentSurvey();
 //        courseAttainmentSurvey.setCourseTargetId(target.getId());
 //        courseAttainmentSurveyMAPPER.insert(courseAttainmentSurvey);
+        System.out.println("录入");
+        System.out.println(Data);
         return new DataResponses(true, courseTarget.insert(Data),String.valueOf(Data.getId()));
     }
 

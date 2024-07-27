@@ -14,4 +14,28 @@ public interface CourseBasicInformationSERVICE extends IService<CourseBasicInfor
     public List<CourseBasicInformation> couresNameList(String coursename);
 
     public int getNewCourseId();
+
+    /**
+     * 使用继承方式创建课程时保存课程目标
+     * @param afterSaveCourseId
+     * @param toJiChengCourseId
+     * @return
+     */
+    boolean saveInheritCourseTarget(Integer afterSaveCourseId,Integer toJiChengCourseId);
+
+    /**
+     * 使用继承方式创建课程时保存课程考核方式
+     * @param afterSaveCourseId
+     * @param toJiChengCourseId
+     * @return
+     */
+    boolean saveInheritCourseMethod(Integer afterSaveCourseId,Integer toJiChengCourseId);
+
+    /**
+     * 使用继承方式创建课程时保存课程的试卷设置
+     * @param afterSaveCourseId
+     * @param toJiChengCourseId
+     * @return
+     */
+    boolean saveInheritCoursePaper(Integer afterSaveCourseId,Integer toJiChengCourseId);
 }

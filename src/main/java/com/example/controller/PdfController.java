@@ -9,8 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+//import java.io.InputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api")
@@ -23,7 +28,18 @@ public class PdfController {
 
         // 读取PDF文件内容
         InputStream inputStream = pdfFile.getInputStream();
-        byte[] pdfBytes = inputStream.readAllBytes();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int bytesRead;
+        byte[] data = new byte[1024];
+
+        while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, bytesRead);
+        }
+
+        byte[] pdfBytes = buffer.toByteArray();
+        inputStream.close();
+        buffer.close();
 
         // 设置HTTP头信息
         HttpHeaders headers = new HttpHeaders();

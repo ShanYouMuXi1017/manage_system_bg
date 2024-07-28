@@ -8,6 +8,7 @@ import com.example.mapper.UserMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
 import com.example.object.College;
 import com.example.object.LoginDTO;
+import com.example.object.ModifyPassDTO;
 import com.example.object.User;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.service.UserSERVICE;
@@ -237,12 +238,9 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                 }
             }
             return new DataResponses(true, "导入成功");
-
         } catch (IOException exception) {
             return new DataResponses(false, "导入失败，表格数据有缺失");
         }
-
-
     }
 
     //用户导出 导入模板
@@ -472,5 +470,13 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
     }
 
 
+    @Override
+    public DataResponses updatePassword(ModifyPassDTO data) {
+        int update = userMAPPER.updatePassword(data.getId(),data.getOldPassword(),data.getPassword());
+        if (update >= 1) {
+            return new DataResponses(true,"密码修改成功");
+        }
+        return new DataResponses(false,"密码修改失败,请核对旧密码");
+    }
 }
 

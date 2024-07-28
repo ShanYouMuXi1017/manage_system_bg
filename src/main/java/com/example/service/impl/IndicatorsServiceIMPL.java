@@ -3,48 +3,36 @@ package com.example.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.mapper.CollegeMAPPER;
 import com.example.mapper.IndicatorOutlineMAPPER;
 import com.example.mapper.IndicatorsMAPPER;
+import com.example.object.College;
 import com.example.object.IndicatorOutline;
 import com.example.object.Indicators;
 import com.example.service.IndicatorsSERVICE;
 import com.example.utility.DataResponses;
 import com.example.utility.DocPOI.ExcelWriter;
 import com.example.utility.DocPOI.WordWriter;
-import com.example.utility.export.export;
-import com.sini.com.spire.doc.Table;
-import com.sini.com.spire.doc.*;
-import com.sini.com.spire.doc.documents.*;
-import com.spire.xls.FileFormat;
-import com.spire.xls.Workbook;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xwpf.usermodel.TableRowAlign;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
-import java.awt.Color;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicators> implements IndicatorsSERVICE {
@@ -153,11 +141,9 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
             byte[] pdfBytes = Files.readAllBytes(Paths.get("indicators.pdf"));
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=indicators.pdf");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(pdfBytes);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(pdfBytes.length);
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
         } catch (IOException ignored) {
         }
         return null;
@@ -260,7 +246,15 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
         }
     }
 
-    public DataResponses getAllMajorsAndVersions() {
+    @Autowired
+    CollegeMAPPER collegeMAPPER;
+
+    /**
+     * 分权限返回专业和对应的所有版本
+     *
+     * @return 专业和版本对象
+     */
+    public DataResponses getAllMajorsAndVersions(HashMap<String, String> permissionAndCollege) {
         @Data
         class MajorsAndVersions {
             String major;
@@ -271,16 +265,31 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
                 this.versions = versions;
             }
         }
-
+        //获得指标点表中的所有已记录专业
         List<Map<String, Object>> majorsMap = listMaps(
                 new QueryWrapper<Indicators>().select("DISTINCT major")
         );
+
+        List<String> majors = new ArrayList<>();
         List<MajorsAndVersions> majorsAndVersions = new ArrayList<>();
+
+        //判断如果权限在校领导之下, 则分学院
+        if (Integer.parseInt(permissionAndCollege.get("permission")) <= 2) {
+            List<Object> allMajors = collegeMAPPER.selectObjs(new QueryWrapper<College>()
+                    .select("DISTINCT major_name")
+                    .lambda()
+                    .eq(College::getCollegeName, permissionAndCollege.get("collegeName")));
+            majorsMap.forEach(majorMap -> {
+                if (allMajors.contains(majorMap.get("major")))
+                    majors.add(String.valueOf(majorMap.get("major")));
+            });
+        } else {
+            majorsMap.forEach(majorMap -> {
+                majors.add(String.valueOf(majorMap.get("major")));
+            });
+        }
         //简单粗暴
-        for (Map<String, Object> majorMap : majorsMap) {
-            String major = StringUtils.substringBetween(
-                    majorMap.values().toString(),
-                    "[", "]");
+        for (String major : majors) {
             List<String> versions = new ArrayList<>();
             listMaps(new QueryWrapper<Indicators>()
                     .select("DISTINCT version")

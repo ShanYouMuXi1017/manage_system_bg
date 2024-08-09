@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ClassPathResource;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.mapper.EducationProgramMAPPER;
@@ -19,8 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -151,7 +154,6 @@ public class EducationProgramController {
             throw new RuntimeException(e);
         }
     }
-
 
     @ApiOperation("展示对应的方案文件")
     @GetMapping("/showPDF/{major}/{majorVersion}")

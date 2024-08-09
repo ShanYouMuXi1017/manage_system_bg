@@ -42,6 +42,7 @@ public class SaTokenConfigure implements WebMvcConfigurer {
                     .notMatch("/courseExamPaper/Table/*")    //取消拦截文件导出
                     .notMatch("/manager/**")    //取消拦截文件导出
                     .notMatch("/report/**")    //取消拦截文件导出
+                    .notMatch("/api/**")
                     .check(r -> StpUtil.checkLogin());       // 要执行的校验动作，可以写完整的 lambda 表达式
             // 根据路由划分模块，不同模块不同鉴权
             SaRouter.match("/user/choiceRole", r -> StpUtil.checkRoleOr("3","4","5","6"));

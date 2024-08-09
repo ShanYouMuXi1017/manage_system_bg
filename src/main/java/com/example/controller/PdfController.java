@@ -1,36 +1,58 @@
 package com.example.controller;
 
-import org.springframework.core.io.ClassPathResource;
+import cn.hutool.core.io.resource.ClassPathResource;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
 public class PdfController {
 
-    @GetMapping("/pdf")
+
+    @ApiOperation("展示操作文档信息")
+    @GetMapping("/OPpdf")
     public ResponseEntity<byte[]> getPdf() throws IOException {
         // 假设PDF文件存储在resources/static目录下
-        ClassPathResource pdfFile = new ClassPathResource("static/OperationDocument.pdf");
+        cn.hutool.core.io.resource.ClassPathResource pdfFile = new ClassPathResource("static/OperationDocument.pdf");
 
         // 读取PDF文件内容
-        InputStream inputStream = pdfFile.getInputStream();
-        byte[] pdfBytes = inputStream.readAllBytes();
+        InputStream inputStream = pdfFile.getStream();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int bytesRead;
+        byte[] data = new byte[1024];
+
+        while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, bytesRead);
+        }
+
+        byte[] pdfBytes = buffer.toByteArray();
+        inputStream.close();
+        buffer.close();
 
         // 设置HTTP头信息
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", pdfFile.getFilename());
+        headers.setContentDispositionFormData("attachment", pdfFile.getName());
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
     }
 
     //@GetMapping("/pdf")

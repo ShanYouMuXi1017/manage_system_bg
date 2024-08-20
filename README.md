@@ -26,7 +26,28 @@ url: jdbc:mysql://localhost:3306/Manage_system?serverTimezone=UTC&useUnicode=tru
 里的
 
 ```
-3305/manage_system
+3306/Manage_system
 ```
 
 换成与自己本地数据库所对应的端口号及数据库名称
+
+将
+
+```xml
+server:
+  port: 2024
+```
+
+换成
+
+```xml
+server:
+  port: 8080
+```
+
+
+
+## 部署
+
+详情请查看 工程教育认证技术开发文档.md
+

@@ -45,7 +45,19 @@ server:
   port: 8080
 ```
 
+将
 
+```xml
+      username: root
+      password: 123456
+```
+
+换成
+
+```xml
+      username: root
+      password: 12345
+```
 
 ## 部署
 

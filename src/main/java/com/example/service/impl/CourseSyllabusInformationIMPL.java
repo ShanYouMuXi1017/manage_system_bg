@@ -13,19 +13,27 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 @Service
 public class CourseSyllabusInformationIMPL extends ServiceImpl<CourseSyllabusInformationMAPPER, CourseSyllabusInformation> implements CourseSyllabusInformationSERVICE {
@@ -74,10 +82,22 @@ public class CourseSyllabusInformationIMPL extends ServiceImpl<CourseSyllabusInf
         //写入文件
         //使用字节数组读取
         try {
-            String template = "/src/main/resources/static/培养方案课程录入.xlsx";
-            byte[] bytes = FileUtil.readBytes(
-                    new File("").getCanonicalPath() + template);
-
+            //主义文件名
+            String resourcePath = "classpath:static/培养方案课程录入.xlsx";
+            Resource resource = new DefaultResourceLoader().getResource(resourcePath);
+            byte[] bytes = null;
+            try (InputStream inputStream = resource.getInputStream()) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                  bytes = outputStream.toByteArray();
+                System.out.println("找到文件");
+            } catch (IOException e) {
+                System.out.println("未找到文件");
+            }
             response.reset();
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.addHeader("Content-Disposition","attachment;filename=fileName"+".xlsx");

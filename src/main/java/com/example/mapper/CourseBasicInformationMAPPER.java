@@ -18,7 +18,6 @@ public interface CourseBasicInformationMAPPER extends BaseMapper<CourseBasicInfo
             "where id = #{courseId};")
     Boolean updateStatus(@Param("courseId") int courseId);
 
-
     @Select("SELECT major, course_name FROM course_syllabus_information ORDER BY major, course_name")
     List<CourseSyllabusInformation> getCourses();
 
@@ -27,4 +26,5 @@ public interface CourseBasicInformationMAPPER extends BaseMapper<CourseBasicInfo
 
     @Select("SELECT * FROM course_basic_information ORDER BY id DESC LIMIT 1 ")
     int getNewCourseId();
+
 }

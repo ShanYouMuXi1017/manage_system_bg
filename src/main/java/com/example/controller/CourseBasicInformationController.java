@@ -1,11 +1,10 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.mapper.CollegeMAPPER;
-import com.example.mapper.CourseSyllabusInformationMAPPER;
-import com.example.mapper.CourseTargetMAPPER;
-import com.example.mapper.IndicatorsMAPPER;
+import com.example.mapper.*;
 import com.example.mapper.courseSurvey.CourseAttainmentSurveyMAPPER;
+import com.example.mapper.examinePaper.CourseFinalExamPaperDetailMAPPER;
+import com.example.mapper.examinePaper.CourseFinalExamPaperMAPPER;
 import com.example.object.*;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.service.impl.CourseSyllabusInformationIMPL;
@@ -51,12 +50,25 @@ public class CourseBasicInformationController {
     @Autowired
     private CourseBasicInformationServiceIMPL courseBasicInformationService;
 
+
+    @Autowired
+    private CourseExamineMethodsMAPPER courseExamineMethodsMAPPER;
+
+    @Autowired
+    private CourseExamineChildMethodsMAPPER courseExamineChildMethodsMAPPER;
+
+    @Autowired
+    private CourseFinalExamPaperMAPPER courseFinalExamPaperMAPPER;
+
+    @Autowired
+    private CourseFinalExamPaperDetailMAPPER courseFinalExamPaperDetailMAPPER;
+
+
     @ApiOperation("查询所有专业以及专业下面的所有课程名称")
     @GetMapping("/tree")
     public List<Map<String, Object>> getCourseTree() {
         return courseBasicInformationService.getCourseTree();
     }
-
 
     @ApiOperation("查询全部")
     @GetMapping
@@ -123,7 +135,10 @@ public class CourseBasicInformationController {
     @ApiOperation("添加")
     @PostMapping
     public DataResponses write(@RequestBody CourseBasicInformation pages) {
-        return new DataResponses(courseBasicInformationService.save(pages));
+
+        boolean saveFlag = courseBasicInformationService.save(pages);
+        //返回已经保存的课程的id
+        return new DataResponses(saveFlag,pages.getId());
     }
 
     @ApiOperation("删除")
@@ -132,6 +147,7 @@ public class CourseBasicInformationController {
         return new DataResponses(courseBasicInformationService.removeById(pages));
     }
 
+
     @ApiOperation("获取最新的id")
     @GetMapping("/getNewCourseId")
     public int getNewCourseId() {
@@ -139,7 +155,6 @@ public class CourseBasicInformationController {
         System.out.println("id"+id);
         return id;
     }
-
 /*
     课程目标相关接口
  */
@@ -221,7 +236,6 @@ public class CourseBasicInformationController {
     public DataResponses getAllIndicatorMajors(@RequestBody HashMap<String, String> permissionAndCollege) {
         return indicatorsServiceIMPL.getAllMajorsAndVersions(permissionAndCollege);
     }
-
     @ApiOperation("删除指标点")
     @DeleteMapping("/indicators")
     public DataResponses removeIndicators(@RequestBody ArrayList<Indicators> indicatorsList) {
@@ -447,28 +461,75 @@ public class CourseBasicInformationController {
     @PostMapping("/majorList")
     public DataResponses majorList(@RequestBody HashMap<String, String> info) {
         QueryWrapper<College> queryWrapper = new QueryWrapper<>();
-        String admin = info.get("isAdmin");
-        if(admin.equals("3")){
-            queryWrapper.select(" major_name");
-            return new DataResponses(true, collegeMAPPER.selectList(queryWrapper));
-        }
-        queryWrapper.eq("college_name", info.get("collegeName"));
+        queryWrapper.like("college_name", info.get("collegeName"));
         queryWrapper.select(" major_name");
         return new DataResponses(true, collegeMAPPER.selectList(queryWrapper));
     }
 
-
-//    以下接口用于继承
+    //    以下接口用于继承
     @Autowired(required=false)
-        @ApiOperation("根据课程名称查询课程信息")
-        @GetMapping("/majorList/{courseName}")
-        public DataResponses nameMajorList(@PathVariable String courseName) {
-            System.out.println(courseName);
+    @ApiOperation("根据课程名称查询课程信息")
+    @GetMapping("/majorList/{courseName}")
+    public DataResponses nameMajorList(@PathVariable String courseName) {
+        System.out.println(courseName);
 
-            List<CourseBasicInformation> list = courseBasicInformationService.couresNameList(courseName);
-            System.out.println(list);
-            return new DataResponses(true, list);
+        List<CourseBasicInformation> list = courseBasicInformationService.couresNameList(courseName);
+        System.out.println(list);
+        return new DataResponses(true, list);
+    }
+
+    @ApiOperation("保存由继承创建的课程的课程目标")
+    @PostMapping("/inheritCourseTarget")
+    public DataResponses addJiChengCourseTarget(@RequestBody HashMap<String, Integer> info) {
+        /*
+         * 注：“afterSaveCourseId”代表在前端创建课程时选择使用继承创建课程的 课程
+         *    “toJiChengCourseId”代表在前端创建课程时选择使用继承创建课程的 父课程
+         * */
+        Integer afterSaveCourseId = info.get("afterSaveCourseId");
+        Integer toJiChengCourseId = info.get("toJiChengCourseId");
+        boolean saveTargetFlag = false;
+        if(afterSaveCourseId != null && toJiChengCourseId != null){
+            saveTargetFlag = courseBasicInformationService.saveInheritCourseTarget(afterSaveCourseId, toJiChengCourseId);
         }
+
+        return new DataResponses(saveTargetFlag);
+    }
+
+    @ApiOperation("保存由继承创建的课程的课程考核评价方式")
+    @PostMapping("/inheritCourseMethod")
+    public DataResponses addJiChengCourseMethod(@RequestBody HashMap<String, Integer> info) {
+        /*
+         * 注：“afterSaveCourseId”代表在前端创建课程时选择使用继承创建课程的 课程
+         *    “toJiChengCourseId”代表在前端创建课程时选择使用继承创建课程的 父课程
+         * */
+        Integer afterSaveCourseId = info.get("afterSaveCourseId");
+        Integer toJiChengCourseId = info.get("toJiChengCourseId");
+        boolean saveMethodFlag = false;
+
+        if(afterSaveCourseId != null && toJiChengCourseId != null){
+            saveMethodFlag = courseBasicInformationService.saveInheritCourseMethod(afterSaveCourseId, toJiChengCourseId);
+        }
+
+        return new DataResponses(saveMethodFlag);
+    }
+
+    @ApiOperation("保存由继承创建的课程的试卷设置")
+    @PostMapping("/inheritCourseExamPaper")
+    public DataResponses addJiChengCoursePaper(@RequestBody HashMap<String, Integer> info) {
+        /*
+         * 注：“afterSaveCourseId”代表在前端创建课程时选择使用继承创建课程的 课程
+         *    “toJiChengCourseId”代表在前端创建课程时选择使用继承创建课程的 父课程
+         * */
+        Integer afterSaveCourseId = info.get("afterSaveCourseId");
+        Integer toJiChengCourseId = info.get("toJiChengCourseId");
+        boolean saveCoursePaperFlag = false;
+
+        if(afterSaveCourseId != null && toJiChengCourseId != null){
+            saveCoursePaperFlag = courseBasicInformationService.saveInheritCoursePaper(afterSaveCourseId, toJiChengCourseId);
+        }
+
+        return new DataResponses(saveCoursePaperFlag);
+    }
 
 
 

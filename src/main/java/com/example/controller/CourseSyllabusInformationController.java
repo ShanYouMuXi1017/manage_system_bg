@@ -15,6 +15,7 @@ import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.service.impl.CourseSyllabusInformationIMPL;
 import com.example.service.impl.UserServiceIMPL;
 import com.example.utility.DataResponses;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+@Api(tags = "教学大纲")
 @RestController
 @RequestMapping("/courseSyllabus")
 public class CourseSyllabusInformationController {

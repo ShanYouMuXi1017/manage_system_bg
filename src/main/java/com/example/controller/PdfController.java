@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import io.swagger.annotations.Api;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+@Api(tags = "pdf文档")
 @RestController
 @RequestMapping("/api")
 public class PdfController {

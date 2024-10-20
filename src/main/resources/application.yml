@@ -11,9 +11,9 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      #      url: jdbc:mysql://43.140.201.70:3306/Manage_system?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
-      #使用本地数据库
       url: jdbc:mysql://localhost:3306/Manage_system?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+      #使用本地数据库
+#      url: jdbc:mysql://localhost:3307/manage_system?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
       username: root
       password: 123456
 
@@ -27,7 +27,7 @@ spring:
       max-file-size: 10MB
 
 server:
-  port: 8080
+  port: 2024
 
 logging:
   level:

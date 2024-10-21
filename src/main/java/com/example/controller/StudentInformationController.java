@@ -96,7 +96,7 @@ public class StudentInformationController {
         return new DataResponses(true, studentInformationServiceIMPL.getComprehensiveScore(courseId));
     }
 
-    @ApiOperation("导出综合成绩分析表")
+    @ApiOperation("导出综合成绩分析表") //描述性统计
     @GetMapping("/{courseId}/exportComprehensiveScoreAnalyse")
     public ResponseEntity<byte[]> exportComprehensiveScoreAnalyse(@PathVariable int courseId) {
         return studentInformationServiceIMPL.exportComprehensiveScoreAnalyse(courseId);
@@ -116,7 +116,7 @@ public class StudentInformationController {
         return studentInformationServiceIMPL.exportComprehensiveScore(response, courseId);
     }
 
-    @ApiOperation("导出达成度分析表")
+    @ApiOperation("导出达成度分析表") // 全班的统计成绩
     @GetMapping("/{courseId}/{type}/exportDegreeOfAchievement")
     public ResponseEntity<byte[]> exportDegreeOfAchievement(@PathVariable int courseId, @PathVariable int type) {
         return studentInformationServiceIMPL.exportDegreeOfAchievement(courseId, type);

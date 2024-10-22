@@ -102,6 +102,12 @@ public class StudentInformationController {
         return studentInformationServiceIMPL.exportComprehensiveScoreAnalyse(courseId);
     }
 
+    @ApiOperation("导出综合成绩分析图片") //描述性统计图片15879
+    @GetMapping("/{courseId}/exportComprehensiveScoreAnalyse2")
+    public ResponseEntity<byte[]> exportComprehensiveScoreAnalyse2(@PathVariable int courseId) {
+        return studentInformationServiceIMPL.exportComprehensiveScoreAnalyse2(courseId);
+    }
+
     @ApiOperation("获取课程综合成绩分析数据")
     @GetMapping("/{courseId}/getScoreAnalyse")
     public DataResponses getScoreAnalyse(@PathVariable int courseId) {

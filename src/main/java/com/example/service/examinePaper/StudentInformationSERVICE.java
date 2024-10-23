@@ -31,6 +31,9 @@ public interface StudentInformationSERVICE extends IService<StudentInformation> 
     //导出成绩分析PDF
     ResponseEntity<byte[]> exportComprehensiveScoreAnalyse(int courseId);
 
+    //导出成绩分析图片
+    ResponseEntity<byte[]> exportComprehensiveScoreAnalyse2(int courseId);
+
     //课程成绩分析
     void analyse(int courseId);
 }

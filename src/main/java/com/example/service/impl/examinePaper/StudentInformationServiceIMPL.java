@@ -22,6 +22,8 @@ import com.example.service.examinePaper.StudentInformationSERVICE;
 import com.example.utility.DataResponses;
 import com.example.utility.export.export;
 import com.spire.xls.FileFormat;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.hssf.OldExcelFormatException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -29,13 +31,19 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -43,6 +51,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -576,13 +585,129 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
-            return ResponseEntity.ok()
+            ResponseEntity<byte[]> body = ResponseEntity.ok()
                     .headers(headers)
                     .body(pdfBytes);
+            System.out.println("----------------------");
+            System.out.println(Arrays.toString(body.getBody()));
+            return body;
         } catch (IOException e) {
             return null;
         }
     }
+
+    //导出成绩分析图片15879
+    @Override
+    public ResponseEntity<byte[]> exportComprehensiveScoreAnalyse2(int courseId) {
+        analyse(courseId);
+        try {
+            Workbook workbook = new HSSFWorkbook();
+            Sheet sheet = workbook.createSheet();
+            //单元格样式
+            CellStyle style = workbook.createCellStyle();
+            style.setBorderBottom(BorderStyle.THIN);
+            style.setBorderTop(BorderStyle.THIN);
+            style.setBorderRight(BorderStyle.THIN);
+            style.setBorderLeft(BorderStyle.THIN);
+            style.setAlignment(HorizontalAlignment.CENTER);
+            style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            CellStyle style2 = workbook.createCellStyle();
+            style2.setBorderBottom(BorderStyle.THIN);
+            style2.setBorderTop(BorderStyle.THIN);
+            style2.setBorderRight(BorderStyle.THIN);
+            style2.setBorderLeft(BorderStyle.THIN);
+
+            QueryWrapper<CourseScoreAnalyse> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("course_id", courseId);
+            CourseScoreAnalyse scoreAnalyse = courseScoreAnalyseMAPPER.selectOne(queryWrapper);
+
+            export.valueToCell(sheet, 1, 1, "分数段", style2);
+            export.valueToCell(sheet, 1, 2, "优", style2);
+            export.valueToCell(sheet, 2, 2, ">= 90", style2);
+            export.valueToCell(sheet, 3, 2, scoreAnalyse.getSuperior().toString(), style2);
+            export.valueToCell(sheet, 4, 2, String.valueOf(export.doubleFormat(scoreAnalyse.getSuperior() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
+
+            export.valueToCell(sheet, 1, 3, "良", style2);
+            export.valueToCell(sheet, 2, 3, "80-89", style2);
+            export.valueToCell(sheet, 3, 3, scoreAnalyse.getGreat().toString(), style2);
+            export.valueToCell(sheet, 4, 3, String.valueOf(export.doubleFormat(scoreAnalyse.getGreat() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
+
+            export.valueToCell(sheet, 1, 4, "中", style2);
+            export.valueToCell(sheet, 2, 4, "70-79", style2);
+            export.valueToCell(sheet, 3, 4, scoreAnalyse.getGood().toString(), style2);
+            export.valueToCell(sheet, 4, 4, String.valueOf(export.doubleFormat(scoreAnalyse.getGood() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
+
+            export.valueToCell(sheet, 1, 5, "及格", style2);
+            export.valueToCell(sheet, 2, 5, "60-69", style2);
+            export.valueToCell(sheet, 3, 5, scoreAnalyse.getPass().toString(), style2);
+            export.valueToCell(sheet, 4, 5, String.valueOf(export.doubleFormat(scoreAnalyse.getPass() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
+
+            export.valueToCell(sheet, 1, 6, "不及格", style2);
+            export.valueToCell(sheet, 2, 6, "< 60", style2);
+            export.valueToCell(sheet, 3, 6, scoreAnalyse.getFailed().toString(), style2);
+            export.valueToCell(sheet, 4, 6, String.valueOf(export.doubleFormat(scoreAnalyse.getFailed() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
+
+            export.valueToCell(sheet, 3, 1, "人数", style2);
+            export.valueToCell(sheet, 4, 1, "比例", style2);
+            export.valueToCell(sheet, 5, 1, "最高分", style2);
+            export.valueToCell(sheet, 5, 2, String.valueOf(scoreAnalyse.getMaxScore()), style2);
+            export.valueToCell(sheet, 5, 3, "最低分", style2);
+            export.valueToCell(sheet, 5, 4, String.valueOf(scoreAnalyse.getMinScore()), style2);
+            export.valueToCell(sheet, 5, 5, "平均分", style2);
+            export.valueToCell(sheet, 5, 6, String.valueOf(scoreAnalyse.getAverageScore()), style2);
+            export.valueToCell(sheet, 6, 1, "及格率", style2);
+            export.valueToCell(sheet, 6, 2, String.valueOf(scoreAnalyse.getPassRate()), style2);
+
+            CellRangeAddress mergedRegion = new CellRangeAddress(1, 6, 0, 0);
+            sheet.addMergedRegion(mergedRegion);
+            export.valueToCell(sheet, 1, 0, "综合成绩", style);
+            export.reloadCellStyle(mergedRegion, sheet, style);
+
+            mergedRegion = new CellRangeAddress(0, 0, 0, 6);
+            sheet.addMergedRegion(mergedRegion);
+            export.valueToCell(sheet, 0, 0, "课程成绩分析", style);
+            export.reloadCellStyle(mergedRegion, sheet, style);
+
+            ByteArrayOutputStream outputStreamXLS = new ByteArrayOutputStream();
+            workbook.write(outputStreamXLS);
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStreamXLS.toByteArray());
+
+            // 加载 XLS 文件
+            com.spire.xls.Workbook workbookn = new com.spire.xls.Workbook();
+            workbookn.loadFromStream(inputStream);
+
+            workbookn.getConverterSetting().setSheetFitToPage(true);
+            workbookn.getConverterSetting().setSheetFitToWidth(true);
+            // 将 XLS 文件转换为 PDF 文件
+            ByteArrayOutputStream outputStreamPDF = new ByteArrayOutputStream();
+
+            workbookn.saveToStream(outputStreamPDF, FileFormat.PDF);
+            //使用字节数组读取
+            byte[] pdfBytes = outputStreamPDF.toByteArray();
+
+            // 使用 PDFBox 将 PDF 转换为 PNG
+            PDDocument document = PDDocument.load(pdfBytes);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            for (int i = 0; i < document.getNumberOfPages(); i++) {
+                BufferedImage bufferedImage = new PDFRenderer(document).renderImageWithDPI(i, 300);
+                ImageIO.write(bufferedImage, "png", outputStream);
+            }
+            document.close();
+            byte[] pngBytes = outputStream.toByteArray();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.png");
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pngBytes);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
 
     //课程成绩分析
     @Override

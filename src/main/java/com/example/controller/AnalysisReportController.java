@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.mapper.CourseBasicInformationMAPPER;
 import com.example.mapper.comprehensiveAnalyse.ExamPaperAnalyseReportMAPPER;
 import com.example.object.comprehensiveAnalyse.ExamPaperAnalyseReport;
+import com.example.service.StatisticalAnalysisSERVICE;
 import com.example.service.impl.AnalysisReportServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @Api(tags = "分析报告")
@@ -69,6 +72,25 @@ public class AnalysisReportController {
             examPaperAnalyseReportMAPPER.insert(item);
         }
         return new DataResponses(true, item.getCourseId());
+    }
+
+
+
+//    &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    /*
+    * 以下为统计分析接口
+    * */
+    @Autowired
+    private StatisticalAnalysisSERVICE statisticalAnalysisService;
+
+    @ApiOperation("获取横向对比分析数据")
+    @PostMapping("/getScoreCrosswiseAnalyse")
+    public DataResponses getCourseScores(@RequestBody Map<String, Object> params) {
+        List<String> courseName = (List<String>) params.get("courseName");
+        Integer teacherId = (Integer) params.get("teacherId");
+        // 调用服务层的方法获取详细的成绩数据
+        Map<String, Object> response = statisticalAnalysisService.getScoresByCoursesAndTeacherId(courseName, teacherId);
+        return new DataResponses(true, response);
     }
 
 

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Api(tags = "统计分析")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/courseAnalysis")
 public class StatisticalAnalysisController {
